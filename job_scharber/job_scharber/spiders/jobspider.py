@@ -6,5 +6,8 @@ class JobSpider(scrapy.Spider):
     allowed_domains = ["germantechjobs.de"]
     start_urls = ["https://germantechjobs.de"]
 
+    
     def parse(self, response):
-        pass
+        print("Scraped Content from:", response.url)
+        
+        
