@@ -11,27 +11,50 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class Germantech {
     public static void main(String[] args) {
         HttpClient client = HttpClient.newHttpClient();
+
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("https://germantechjobs.de/api/jobsLight"))
-                .header("Accept", "application/json") // Request a JSON response
+                .header("Accept", "application/json")
                 .GET()
                 .build();
 
         try {
-            // 3. Send the request and receive the response as a String
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-            System.out.println("Status Code: " + response.statusCode());
+            if (response.statusCode() == 200) {
+                ObjectMapper mapper = new ObjectMapper();
 
-            String jsonPayload = response.body();
-            // System.out.println("JSON Payload:\n" + jsonPayload);
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode jsonNode = mapper.readTree(jsonPayload);
-            String allremoteJobs = jsonNode.get("workplace").asText();
-            System.out.println("Remote Job:" + allremoteJobs);
+                JsonNode rootNode = mapper.readTree(response.body());
+
+                System.out.println("--- Remote Jobs Found ---");
+                int remoteCount = 0;
+
+                if (rootNode.isArray()) {
+                    for (JsonNode job : rootNode) {
+                        JsonNode workplace = job.get("workplace");
+
+                        if (workplace != null && "remote".equalsIgnoreCase(workplace.asText())) {
+                            remoteCount++;
+
+                            String title = job.has("name") ? job.get("name").asText() : "Unknown Title";
+                            String company = job.has("company") ? job.get("company").asText() : "Unknown Company";
+
+                            System.out.println(remoteCount + ". " + title + " @ " + company);
+
+                            // System.out.println(job.toPrettyString());
+                        }
+                    }
+                    System.out.println("\nTotal remote jobs found: " + remoteCount);
+                } else {
+                    System.out.println("Expected a JSON array, but received a different structure.");
+                }
+            } else {
+                System.err.println("Request failed with status code: " + response.statusCode());
+            }
 
         } catch (Exception e) {
-            System.err.println("Request failed: " + e.getMessage());
+            System.err.println("Error fetching data: " + e.getMessage());
         }
     }
+
 }
