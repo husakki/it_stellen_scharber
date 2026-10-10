@@ -28,6 +28,7 @@ public class Germantech {
 
                 System.out.println("--- Remote Jobs Found ---");
                 int remoteCount = 0;
+                int jobsInHamburgCount = 0;
 
                 if (rootNode.isArray()) {
                     for (JsonNode job : rootNode) {
@@ -43,8 +44,21 @@ public class Germantech {
 
                             // System.out.println(job.toPrettyString());
                         }
+
+                        JsonNode city = job.get("cityCategory");
+
+                        if (city != null && "Hamburg".equalsIgnoreCase(city.asText())) {
+                            jobsInHamburgCount++;
+
+                            String title = job.has("name") ? job.get("name").asText() : "Unknown Title";
+                            String company = job.has("company") ? job.get("company").asText() : "Unknown Company";
+
+                            System.out.println(jobsInHamburgCount + ". " + title + " @ " + company);
+
+                        }
                     }
                     System.out.println("\nTotal remote jobs found: " + remoteCount);
+                    System.out.println("\nTotal jobs in Hamburg found: " + jobsInHamburgCount);
                 } else {
                     System.out.println("Expected a JSON array, but received a different structure.");
                 }
