@@ -23,6 +23,7 @@ public class Germantech implements IScraper {
                 .GET()
                 .build();
 
+        HashSet<Job> foundJobSet = new HashSet<>();
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
@@ -33,8 +34,6 @@ public class Germantech implements IScraper {
 
                 int remoteCount = 0;
                 int jobsInHamburgCount = 0;
-
-                HashSet<Job> foundJobList = new HashSet<>();
 
                 if (rootNode.isArray()) {
                     for (JsonNode job : rootNode) {
@@ -48,7 +47,7 @@ public class Germantech implements IScraper {
                             String jobURL = job.has("jobUrl") ? job.get("name").asText() : "Unknown URL";
                             String city = job.has("cityCategory") ? job.get("name").asText() : "Unknown City";
 
-                            foundJobList.add(new Job(companyName, jobTitle, jobURL, city, true));
+                            foundJobSet.add(new Job(companyName, jobTitle, jobURL, city, true));
                             // System.out.println(remoteCount + ". " + title + " @ " + company);
 
                             // System.out.println(job.toPrettyString());
@@ -66,17 +65,17 @@ public class Germantech implements IScraper {
                                     : "Unknown Workplace";
 
                             boolean isRemote = "remote".equalsIgnoreCase(workplace) ? true : false;
-                            foundJobList.add(new Job(companyName, jobTitle, jobURL, "Hamburg", isRemote));
+                            foundJobSet.add(new Job(companyName, jobTitle, jobURL, "Hamburg", isRemote));
 
                             // System.out.println(jobsInHamburgCount + ". " + title + " @ " + company);
 
                         }
                     }
-                    System.out.println("\nTotal remote jobs found: " + remoteCount);
-                    System.out.println("\nTotal jobs in Hamburg found: " + jobsInHamburgCount);
-                    System.out.println("Found job list size: " + foundJobList.size());
+                    System.out.println("Total remote jobs found: " + remoteCount);
+                    System.out.println("Total jobs in Hamburg found: " + jobsInHamburgCount);
+                    System.out.println("Found job list size: " + foundJobSet.size());
                     System.out.println(
-                            "Number of duplicates are: " + ((remoteCount + jobsInHamburgCount) - foundJobList.size()));
+                            "Number of duplicates are: " + ((remoteCount + jobsInHamburgCount) - foundJobSet.size()));
                 } else {
                     System.out.println("Expected a JSON array, but received a different structure.");
                 }
@@ -87,6 +86,7 @@ public class Germantech implements IScraper {
         } catch (Exception e) {
             System.err.println("Error fetching data: " + e.getMessage());
         }
+
     }
 
 }
