@@ -4,10 +4,12 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.HashSet;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import de.husakki.itscraper.DTO.Job;
 import de.husakki.itscraper.interfaces.IScraper;
 
 public class Germantech implements IScraper {
@@ -29,21 +31,25 @@ public class Germantech implements IScraper {
 
                 JsonNode rootNode = mapper.readTree(response.body());
 
-                System.out.println("--- Remote Jobs Found ---");
                 int remoteCount = 0;
                 int jobsInHamburgCount = 0;
 
+                HashSet<Job> foundJobList = new HashSet<>();
+
                 if (rootNode.isArray()) {
                     for (JsonNode job : rootNode) {
-                        JsonNode workplace = job.get("workplace");
+                        JsonNode remote = job.get("workplace");
 
-                        if (workplace != null && "remote".equalsIgnoreCase(workplace.asText())) {
+                        if (remote != null && "remote".equalsIgnoreCase(remote.asText())) {
                             remoteCount++;
 
-                            String title = job.has("name") ? job.get("name").asText() : "Unknown Title";
-                            String company = job.has("company") ? job.get("company").asText() : "Unknown Company";
+                            String companyName = job.has("company") ? job.get("company").asText() : "Unknown Company";
+                            String jobTitle = job.has("name") ? job.get("name").asText() : "Unknown Title";
+                            String jobURL = job.has("jobUrl") ? job.get("name").asText() : "Unknown URL";
+                            String city = job.has("cityCategory") ? job.get("name").asText() : "Unknown City";
 
-                            System.out.println(remoteCount + ". " + title + " @ " + company);
+                            foundJobList.add(new Job(companyName, jobTitle, jobURL, city, true));
+                            // System.out.println(remoteCount + ". " + title + " @ " + company);
 
                             // System.out.println(job.toPrettyString());
                         }
@@ -53,15 +59,24 @@ public class Germantech implements IScraper {
                         if (city != null && "Hamburg".equalsIgnoreCase(city.asText())) {
                             jobsInHamburgCount++;
 
-                            String title = job.has("name") ? job.get("name").asText() : "Unknown Title";
-                            String company = job.has("company") ? job.get("company").asText() : "Unknown Company";
+                            String companyName = job.has("company") ? job.get("company").asText() : "Unknown Company";
+                            String jobTitle = job.has("name") ? job.get("name").asText() : "Unknown Title";
+                            String jobURL = job.has("jobUrl") ? job.get("name").asText() : "Unknown URL";
+                            String workplace = job.has("workplace") ? job.get("workplace").asText()
+                                    : "Unknown Workplace";
 
-                            System.out.println(jobsInHamburgCount + ". " + title + " @ " + company);
+                            boolean isRemote = "remote".equalsIgnoreCase(workplace) ? true : false;
+                            foundJobList.add(new Job(companyName, jobTitle, jobURL, "Hamburg", isRemote));
+
+                            // System.out.println(jobsInHamburgCount + ". " + title + " @ " + company);
 
                         }
                     }
                     System.out.println("\nTotal remote jobs found: " + remoteCount);
                     System.out.println("\nTotal jobs in Hamburg found: " + jobsInHamburgCount);
+                    System.out.println("Found job list size: " + foundJobList.size());
+                    System.out.println(
+                            "Number of duplicates are: " + ((remoteCount + jobsInHamburgCount) - foundJobList.size()));
                 } else {
                     System.out.println("Expected a JSON array, but received a different structure.");
                 }
