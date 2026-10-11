@@ -8,8 +8,11 @@ import java.net.http.HttpResponse;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class Germantech {
-    public static void main(String[] args) {
+import de.husakki.itscraper.interfaces.IScraper;
+
+public class Germantech implements IScraper {
+    @Override
+    public void startScraping() {
         HttpClient client = HttpClient.newHttpClient();
 
         HttpRequest request = HttpRequest.newBuilder()
