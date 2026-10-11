@@ -1,7 +1,5 @@
 package de.husakki.itscraper.DTO;
 
-import java.util.Objects;
-
 /**
  * Job DTO for scraped jobs
  */
@@ -13,6 +11,9 @@ public class Job {
     final boolean isRemote;
 
     public Job(String companyName, String jobTitle, String jobURL, String city, boolean isRemote) {
+        if (jobURL == null)
+            throw new IllegalArgumentException("jobURL cannot be null");
+
         this.companyName = companyName;
         this.jobTitle = jobTitle;
         this.jobURL = jobURL;
@@ -33,13 +34,14 @@ public class Job {
             return true;
         if (o == null || getClass() != o.getClass())
             return false;
+
         Job job = (Job) o;
-        return Objects.equals(jobURL, job.jobURL);
+        return jobURL.equals(job.jobURL);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(jobURL);
+        return jobURL.hashCode();
     }
 
 }
