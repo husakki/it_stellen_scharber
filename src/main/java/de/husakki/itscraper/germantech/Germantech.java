@@ -10,9 +10,21 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.husakki.itscraper.DTO.Job;
+import de.husakki.itscraper.SQLite.SQLFacade;
+import de.husakki.itscraper.interfaces.ISQLite;
 import de.husakki.itscraper.interfaces.IScraper;
 
 public class Germantech implements IScraper {
+    private final ISQLite db;
+
+    public Germantech(ISQLite db) {
+        this.db = db;
+    }
+
+    public Germantech() {
+        this(new SQLFacade());
+    }
+
     @Override
     public void startScraping() {
         HttpClient client = HttpClient.newHttpClient();
@@ -24,6 +36,7 @@ public class Germantech implements IScraper {
                 .build();
 
         HashSet<Job> foundJobSet = new HashSet<>();
+
         try {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
@@ -87,6 +100,9 @@ public class Germantech implements IScraper {
             System.err.println("Error fetching data: " + e.getMessage());
         }
 
+        if (!foundJobSet.isEmpty()) {
+            db.writeScrapToDB(foundJobSet);
+        }
     }
 
 }
