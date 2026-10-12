@@ -29,8 +29,11 @@ public class Germantech implements IScraper {
     public void startScraping() {
         HttpClient client = HttpClient.newHttpClient();
 
+        String APIURL = "https://germantechjobs.de/api/jobsLight";
+        String germantechURL = "https://germantechjobs.de/jobs/";
+
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://germantechjobs.de/api/jobsLight"))
+                .uri(URI.create(APIURL))
                 .header("Accept", "application/json")
                 .GET()
                 .build();
@@ -60,7 +63,7 @@ public class Germantech implements IScraper {
                             String jobURL = job.has("jobUrl") ? job.get("jobUrl").asText() : "Unknown URL";
                             String city = job.has("cityCategory") ? job.get("cityCategory").asText() : "Unknown City";
 
-                            foundJobSet.add(new Job(companyName, jobTitle, jobURL, city, true));
+                            foundJobSet.add(new Job(companyName, jobTitle, (germantechURL + jobURL), city, true));
                             // System.out.println(remoteCount + ". " + title + " @ " + company);
 
                             // System.out.println(job.toPrettyString());
@@ -78,7 +81,8 @@ public class Germantech implements IScraper {
                                     : "Unknown Workplace";
 
                             boolean isRemote = "remote".equalsIgnoreCase(workplace) ? true : false;
-                            foundJobSet.add(new Job(companyName, jobTitle, jobURL, "Hamburg", isRemote));
+                            foundJobSet
+                                    .add(new Job(companyName, jobTitle, (germantechURL + jobURL), "Hamburg", isRemote));
 
                             // System.out.println(jobsInHamburgCount + ". " + title + " @ " + company);
 
