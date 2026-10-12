@@ -5,6 +5,6 @@ CREATE TABLE IF NOT EXISTS jobs (
     job_url TEXT NOT NULL UNIQUE,
     city TEXT,
     is_remote INTEGER,
-    added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TEXT DEFAULT (CURRENT_DATE)
 );
 

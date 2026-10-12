@@ -5,5 +5,5 @@ import java.util.HashSet;
 import de.husakki.itscraper.DTO.Job;
 
 public interface ISQLite {
-    public boolean writeScrapToDB(HashSet<Job> jobSet);
+    public void writeScrapToDB(HashSet<Job> jobSet);
 }

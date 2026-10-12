@@ -44,4 +44,24 @@ public class Job {
         return jobURL.hashCode();
     }
 
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public String getJobTitle() {
+        return jobTitle;
+    }
+
+    public String getJobURL() {
+        return jobURL;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public boolean isRemote() {
+        return isRemote;
+    }
+
 }
